@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>BERT</title>
+    <link href="/2022/09/09/BERT/"/>
+    <url>/2022/09/09/BERT/</url>
+    
+    <content type="html"><![CDATA[<p>BERT（Bidirectional Encoder Representation from Transformers），基于transformer的双向编码表示，它是一个预训练模型，模型训练时的两个任务是预测句子中被掩盖的词以及判断输入的两个句子是不是上下句。在预训练好的BERT模型后面根据特定任务加上相应的网络，可以完成NLP的下游任务，比如文本分类、机器翻译等。</p><h1 id="模型输入"><a href="#模型输入" class="headerlink" title="模型输入"></a>模型输入</h1><p>在BERT中，输入的向量是由三种不同的embedding求和而成，分别是：</p><ol><li><p>wordpiece embedding：单词本身的向量表示。WordPiece是指将单词划分成一组有限的公共子词单元，能在单词的有效性和字符的灵活性之间取得一个折中的平衡。</p></li><li><p>position embedding：将单词的位置信息编码成特征向量。因为我们的网络结构没有RNN 或者LSTM，因此我们无法得到序列的位置信息，所以需要构建一个position embedding。构建position embedding有两种方法：BERT是初始化一个position embedding，然后通过训练将其学出来；而Transformer是通过制定规则来构建一个position embedding</p></li><li><p>segment embedding：用于区分两个句子的向量表示。这个在问答等非对称句子中是用区别的。</p><p>BERT模型的输入就是wordpiece token embedding + segment embedding + position embedding，如图所示</p></li></ol><h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><h1 id="模型预训练"><a href="#模型预训练" class="headerlink" title="模型预训练"></a>模型预训练</h1><p><a href="https://blog.csdn.net/u011412768/article/details/108015783">https://blog.csdn.net/u011412768/article/details/108015783</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>深度学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>bert</tag>
+      
+      <tag>transformer</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>归一化（Normalization）</title>
+    <link href="/2022/09/08/%E5%BD%92%E4%B8%80%E5%8C%96/"/>
+    <url>/2022/09/08/%E5%BD%92%E4%B8%80%E5%8C%96/</url>
+    
+    <content type="html"><![CDATA[<p>归一化（输入归一化、层归一化、批归一化）：使得预处理的数据被限定在一定的范围内（比如[0,1]或者[-1,1]），从而消除奇异样本数据导致的不良影响。奇异样本数据的存在会引起<strong>训练时间增大</strong>，同时也可能导致<strong>无法收敛</strong>，因此，当存在奇异样本数据时，在进行训练之前需要对预处理数据进行归一化；反之，不存在奇异样本数据时，则可以不进行归一化。</p><h2 id="输入归一化"><a href="#输入归一化" class="headerlink" title="输入归一化"></a>输入归一化</h2><p>不同输入特征的取值范围差异比较大时，会影响到梯度下降法的效率。以2维特征为例，特征取值不同会导致大多数位置的梯度方向并不是最优的搜索方向，当使用梯度下降法寻求最优解时，会导致需要很多次迭代才能收敛，如图(a)；当特征归一化后，梯度方向会近似为最优的搜索方向，如图(b)。</p><p><img src="/img/%E5%BD%92%E4%B8%80%E5%8C%96.jfif"></p><h3 id="常见归一化方法"><a href="#常见归一化方法" class="headerlink" title="常见归一化方法"></a>常见归一化方法</h3><h4 id="极差变化法（Min-Max标准化）"><a href="#极差变化法（Min-Max标准化）" class="headerlink" title="极差变化法（Min-Max标准化）"></a>极差变化法（Min-Max标准化）</h4><p>​线性变化，使得转换后特征的取值分布在$[0,1]$区间内。假设数据中特征$f$的取值集合为${f_1,f_2…,f_n}$，特征取值$f_i$经过归一化后$f_i’$的取值为</p><p>$$f_i’&#x3D;{f_i-f_{min}\over f_{max}-f_{min}}$$</p><p>​如果希望取值落在$[-1,1]$，可将上式修改为$f_i’&#x3D;2{f_i-f_{min}\over f_{max}-f_{min}}-1$。</p><p>​映射到任意区间$[a,b]$，则为$f_i’&#x3D;(b-a){f_i-f_{min}\over f_{max}-f_{min}}+a$。</p><h4 id="0均值标准化（Z-score标准化）"><a href="#0均值标准化（Z-score标准化）" class="headerlink" title="0均值标准化（Z-score标准化）"></a>0均值标准化（Z-score标准化）</h4><p>$$f_i’&#x3D;{f_i-\mu\over \sigma}$$</p><p>其中，$\mu&#x3D;{1\over n}\sum\limits_{i&#x3D;1} ^n f_i$为特征$f$的平均值，$\sigma&#x3D;\sqrt[2]{\frac 1n\sum\limits_{i&#x3D;1} ^n (f_i-\mu)^2}$为特征$f$的标准差。</p><h2 id="批归一化（Batch-Normalization）"><a href="#批归一化（Batch-Normalization）" class="headerlink" title="批归一化（Batch Normalization）"></a>批归一化（Batch Normalization）</h2><p>神经网络都是多层结构，上一层 的输出即为下一层的输入，所以即使输入数据做了归一化，由于经过了线性变换以及激活函数，下一层的输入在取值范围可能又会有比较大的差别。从机器学习角度来看，如果某个神经层的输入分布发生了改变，那么其参数需要重新学习，这种现象叫做内部协变量偏移（Internal Covariate Shift）。</p><blockquote><p>在传统机器学习中， 一个常见的问题是协变量偏移（Covariate Shift）。协变量是一个统计学概念，是可能影响预测结果的统计变量。在机器学习中，协变量可以看作是输入。一般的机器学习算法都要求输入在训练集和测试集上的分布是相似的。如果不满足这个假设，在训练集上学习到的模型在测试集上的表现会比较差。</p></blockquote><p>为了解决内部协变量偏移问题，就要使得每一个神经层的输入的分布在训练过程中保持一致，最简单有效的方法就是逐层归一化。<br><strong>批归一化：</strong> 批归一化（Batch Normalization）是对神经层中<strong>单个神经元的输入（出）</strong>进行归一化。</p><p>​我们单从第$l$层第$i$个神经元$W_i^l$来看：上一个神经元的输出$a_i^{l-1}$，经过激活函数作为下一个神经元的输入$z_i^l&#x3D;\sigma(a_i^{l-1})$，$\sigma$为激活函数。要避协变量偏移，就得对$z_i^l$进行归一化，<strong>即归一化进行在线性变化之后，激活函数之前</strong>，一般都用标准正态分布。</p><p>​理想的情况是知道所有训练数据的$z_i^l$但是我们现在用的最多的是小批量梯度下降法，没法再迭代过程中知道所有的$z_i^l$，所以只能用batch size个数据来估计近似。假设有batch size&#x3D;N，则N个训练数据的输入$z_i^l$分别为</p><p>${$z_i^l(1),z_i^l(2)…z_i^l(N)}$</p><p>最后归一化的输入为</p><p>$$\hat{z_i^l}&#x3D;{z_i^l-\mu\over\sigma}$$</p><p>其中$\mu$为该批数据的均值，$\sigma$为该批数据的标准差。</p><p>​对净输入的$z_i^l$标准归一化会使得其取值集中到0附近，如果使用sigmoid型激活函数时，这个取值区间刚好是接近线性变换的区间，减弱了神经网络的非线性性质。因此，为了使得归一化不对网络的表示能力造成负面影响，可以通过一个附加的缩放和平移变换改变取值区间。</p><p>$$\hat{z_i^l}&#x3D;{z_i^l-\mu\over\sigma}\lambda + \beta$$</p><p>其中$\lambda$和$\beta$分别代表缩放和平移的参数向量，是模型自己学习。</p><p>​最后一点还需要注意的是，在使用BN后，神经网络的线性计算（WX + b）中的偏置b将不起作用，因为在（WX + b）求均值后b作为常数均值还是b，在规范化的过程中原数据要减去均值，所以b在这两步计算中完全抵消了。但由于BN的算法中有一个偏置项β，它完全可以代替b的作用，所以有BN的计算中可不用b。</p><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul><li><p><strong>BN使得网络中每层输入数据的分布相对稳定，加速模型学习速度</strong>：BN通过规范化与线性变换使得每一层网络的输入数据的均值与方差都在一定范围内，使得后一层网络不必不断去适应底层网络中输入的变化，从而实现了网络中层与层之间的解耦，允许每一层进行独立学习，有利于提高整个神经网络的学习速度。</p></li><li><p><strong>BN使得模型对网络中的参数不那么敏感，简化调参过程，使得网络学习更加稳定</strong>：在神经网络中，我们经常会谨慎地采用一些权重初始化方法（例如Xavier）或者合适的学习率来保证网络稳定训练。</p></li><li><p><strong>BN允许网络使用饱和性激活函数（例如sigmoid，tanh等），缓解梯度消失问题</strong>：在不使用BN层的时候，由于网络的深度与复杂性，很容易使得底层网络变化累积到上层网络中，导致模型的训练很容易进入到激活函数的梯度饱和区；通过normalize操作可以让激活函数的输入数据落在梯度非饱和区，缓解梯度消失的问题；另外通过自适应学习 γ 与 β 又让数据保留更多的原始信息。</p><blockquote><p><a href="https://zhuanlan.zhihu.com/p/111579675">梯度饱和</a>：梯度饱和常常是和激活函数相关的，比如sigmod和tanh就属于典型容易进入梯度饱和区的函数，即自变量进入某个区间后，梯度变化会非常小，表现在图上就是函数曲线进入某些区域后，越来越趋近一条直线，梯度变化很小，梯度饱和会导致训练过程中梯度变化缓慢，从而造成模型训练缓慢</p></blockquote></li><li><p><strong>BN具有一定的正则化效果</strong>：在Batch Normalization中，由于我们使用mini-batch的均值与方差作为对整体训练样本均值与方差的估计，尽管每一个batch中的数据都是从总体样本中抽样得到，但不同mini-batch的均值与方差会有所不同，这就为网络的学习过程中增加了随机噪音，与Dropout通过关闭神经元给网络训练带来噪音类似，在一定程度上对模型起到了正则化的效果。</p></li></ul><blockquote><p><a href="https://www.jianshu.com/p/491c7bc0e87c">推荐阅读1</a></p><p><a href="https://zhuanlan.zhihu.com/p/55852062">推荐阅读2</a></p></blockquote><h2 id="层归一化（Layer-Normalization）"><a href="#层归一化（Layer-Normalization）" class="headerlink" title="层归一化（Layer Normalization）"></a>层归一化（Layer Normalization）</h2><p>批量归一化是对一个中间层的单个神经元进行归一化操作，因此要求小批量样本的数量不能太小，否则难以计算单个神经元的统计信息。层归一化（Layer Normalization）是和批量归一化非常类似的方法。和批量归一化不同的是，层归一化是对<strong>某一层的所有神经元</strong>进行归一化。</p><p>假设第$l$层有$M$个神经元，那么该层的输入</p><p>$$z^l&#x3D;{ z_1^l,z_2^l…z_M^l }$$</p><p>求输入参数的均值$\mu$和方差$\sigma ^2$，和批归一化一样操作。同时层归一化也会附加一个缩放和平移变换的取值区间，操作方法与批归一化一样。</p><h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h3><p>在标准循环神经网络中，循环神经网络的净输入一般会随着时间慢慢变大或变小，从而导致梯度爆炸或消失。而层归一化的循环神经网络可以有效地缓解这种状况。</p><p>层归一化是基于批归一化进行优化得到的。相比较而言，批归一化是对一个神经元输入的数据以mini-batch为单位来进行汇总，计算平均值和方法，再用这个数据对每个训练样例的输入进行规整。层归一化在面对RNN等问题的时候效果更加优越，也不会受到mini-batch选值的影响。<a href="https://www.jiqizhixin.com/graph/technologies/edceaca3-7a3d-42b3-9189-d80b8b99a6ad"><em>来源</em></a></p><p>相比较于批归一化，层归一化在<strong>速度上不占有优势</strong>。特别是在对CNN进行处理时，有实验证明，层规范化在面对ConvNet时，层归一化在效果和速度上都比批归一化效果差。</p><h2 id="批归一化和层归一化区别"><a href="#批归一化和层归一化区别" class="headerlink" title="批归一化和层归一化区别"></a>批归一化和层归一化区别</h2><p><strong>批量归一化是不同训练数据之间对单个神经元的归一化，层归一化是单个训练数据对某一层所有神经元之间的归一化。</strong> 所以，应当注意这两个“之间”，搞清楚到底是谁与谁进行求平均、方差，乃至归一化。</p><p><img src="/img/1662640261376.png" alt="批归一化和层归一化区别"></p><blockquote><p>参考文章:</p><p><a href="https://blog.csdn.net/a1367666195/article/details/105360306">https://blog.csdn.net/a1367666195/article/details/105360306</a></p><p><a href="https://zhuanlan.zhihu.com/p/55852062">https://zhuanlan.zhihu.com/p/55852062</a></p><p><a href="https://www.jianshu.com/p/491c7bc0e87c">https://www.jianshu.com/p/491c7bc0e87c</a></p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>深度学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>归一化</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>收藏夹</title>
+    <link href="/2022/09/08/%E6%94%B6%E8%97%8F%E5%A4%B9/"/>
+    <url>/2022/09/08/%E6%94%B6%E8%97%8F%E5%A4%B9/</url>
+    
+    <content type="html"><![CDATA[<ul><li><a href="https://mp.weixin.qq.com/s/i7wOqVlsD2zbkgQ3XGtVZQ">Numpy 所有关键知识点系统总结</a><ul><li>小错误有点多，不过比较系统</li></ul></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>其他</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>优质文章</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>正则化（regularization）详解</title>
+    <link href="/2022/09/07/%E6%AD%A3%E5%88%99%E5%8C%96%E8%AF%A6%E8%A7%A3/"/>
+    <url>/2022/09/07/%E6%AD%A3%E5%88%99%E5%8C%96%E8%AF%A6%E8%A7%A3/</url>
+    
+    <content type="html"><![CDATA[<p>正则化防止过拟合（高方差），使拟合曲线更加平滑。</p><h2 id="解决过拟合"><a href="#解决过拟合" class="headerlink" title="解决过拟合"></a>解决过拟合</h2><ul><li>减少变量的个数：舍弃一些变量，保留更为重要的变量。但是，如果每个特征变量都对预测产生影响。当舍弃一部分变量时，也就舍弃了一些信息。所以，希望保留所有的变量。</li><li>正则化：保留所有的变量，将一些不重要的特征的权值置为0或权值变小使得特征的参数矩阵变得稀疏（L<sub>1</sub>正则化），使每一个变量都对预测产生一点影响。</li><li>dropout：神经网络有eval()和train()两种模式。计算预测值时记得切换到eval()模式，这种模式会关闭dropout；而在train()模式下，使用模型进行预测时仍然有部分神经元被dropout。</li><li>增大数据集</li></ul><h2 id="正则化"><a href="#正则化" class="headerlink" title="正则化"></a>正则化</h2><p>​L<sub>1</sub>正则化：Lasso回归，所有参数的绝对值和$|W|&#x3D;\sum_1^n\lvert w_i\lvert$。优点：可以使参数矩阵稀疏，挑选出重要的参数，使不重要参数为0。</p><p>​L<sub>2</sub>正则化：岭回归，所有参数的平方和$|W|&#x3D;\sum_1^n\lvert w_i^2\lvert$。优点：不仅可以防止过拟合，而且还使优化求解变得稳定，提高训练速度。</p><p>​参数$w$的误差函数$J(w)$额外引入“正则”误差（惩罚项）$\lambda C$，其中$\lambda$是一个超参数，用来衡量惩罚项的重要程度，$C$为$\sum_1^n\lvert w_i\lvert$或者$\sum_1^n\lvert w_i\lvert^2$。</p><p>$$J(w)&#x3D;(\hat{y}-y)^2+\lambda C$$</p><h2 id="正则化防止过拟合"><a href="#正则化防止过拟合" class="headerlink" title="正则化防止过拟合"></a>正则化防止过拟合</h2><p>​添加正则项之后，更新$w$参数会使得$w$更小，具体的<a href="https://blog.csdn.net/qq_37344125/article/details/104326946?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-104326946-blog-89482831.topnsimilarv1&spm=1001.2101.3001.4242.1&utm_relevant_index=3">公式推导。</a> $w$很小会使模型（function）是一个比较平滑的函数。</p><ul><li>平滑性：一个平滑的函数，输入变化较大时输出的变化很小。</li></ul><p>而我们的模型（function）越平滑，那么稳定性就越好，那么当输入变化过大，预测的结果那么仍然保持保持高效。</p><h2 id="L-1-稀疏性"><a href="#L-1-稀疏性" class="headerlink" title="$L_1$稀疏性"></a>$L_1$稀疏性</h2><p>​假设只有两个参数$w_1$和$w_2$需要学习，每个蓝色圆（等误差线）代表误差$(\hat{y}-y)^2$相同，黄线为正则化产生的额外误差（惩罚项），蓝黄线的交点处误差最小，即$w_1$和$w_2$正则化后的解。在$L_1$正则化中，黄色线突出的角比边更可能与蓝色圆相交，这个现象在高维的情况下更加明显，因为高维的角更加“突出”，由于角处于坐标轴上（导致部分参数取值为0），于是产生了稀疏解（很多参数为0）。</p><p><img src="/img/%E6%AD%A3%E5%88%99%E5%8C%96%E8%AF%A6%E8%A7%A3/%E6%AD%A3%E5%88%99%E5%8C%96.png" alt="左$L_2右$$L_1$正则化"></p><h2 id="L-2-稳定性"><a href="#L-2-稳定性" class="headerlink" title="$L_2$稳定性"></a>$L_2$稳定性</h2><p>用批数据训练，每次训练数据都会有稍稍不同的误差曲线，以两个参数为例：$L_2$因为是圆形，最优解的变化不会很大，$L_1$的最优解可能会从一个角到另外一个角。</p><p><a href="https://www.bilibili.com/video/BV1Tx411j7tJ?spm_id_from=333.337.search-card.all.click&vd_source=c4d2ace23e042712a3c8ffa7e56c035b">莫烦Python：$L_2$稳定性：3：05</a></p><h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ul><li>如何防止模型过拟合？</li><li>为什么正则化能够防止过拟合？数学角度</li><li>为什么$L_1$正则化具有稀疏性？</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>深度学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>正则化</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>算法面试资源</title>
+    <link href="/2022/09/06/%E7%AE%97%E6%B3%95%E9%9D%A2%E8%AF%95%E8%B5%84%E6%BA%90/"/>
+    <url>/2022/09/06/%E7%AE%97%E6%B3%95%E9%9D%A2%E8%AF%95%E8%B5%84%E6%BA%90/</url>
+    
+    <content type="html"><![CDATA[<p>​深度学习的基础知识以及算法岗面试经验的资源分享！</p><h2 id="深度学习500问"><a href="#深度学习500问" class="headerlink" title="深度学习500问"></a>深度学习500问</h2><p>​本书系统地描述了深度学习的基本理论算法及应用。全书共14章，第1-3章论述了数学基础、机器学习基础和深度学习基础；第4-7章介绍了一些经典网络及计算机视觉领域中常用的CNN、RNN、GAN等网络结构技术；第8-9章介绍了深度学习在计算机视觉领域的目标检测及图像分割两大应用；第10-14章介绍了计算机视觉领域主要的优化方法及思路等，包括迁移学习、网络架构及训练、网络优化技巧、超参数调整及模型的压缩和加速等。本书凝聚了众多一线科研人员及工程师的经验，旨在培养读者发现问题、解决问题、扩展问题的能力。</p><p>​本书内容取材于编者在日常学习过程中总结的知识点及各大公司常见的笔试、面试题。本书可为高等院校计算机科学、信息科学、人工智能、控制科学与工程、电子科学与技术等领域的研究及教学人员提供参考，也可为相关专业本科生及研究生提供思考方向，还可为深度学习及计算机视觉领域的初、中级研究人员和工程技术人员提供参考，尤其适合需要查漏补缺的应聘者及提供相关岗位的面试官阅读。</p><p>​<a href="https://github.com/scutan90/DeepLearning-500-questions">scutan90&#x2F;DeepLearning-500-questions: 深度学习500问</a></p><h2 id="百面机器学习"><a href="#百面机器学习" class="headerlink" title="百面机器学习"></a>百面机器学习</h2><h2 id="NLP知识点总结"><a href="#NLP知识点总结" class="headerlink" title="NLP知识点总结"></a>NLP知识点总结</h2><p>​NLP日常工作经验和论文解析，包含：预训练模型，文本表征，文本相似度，文本分类，多模态，知识蒸馏，词向量。</p><p>​<a href="https://github.com/DA-southampton/NLP_ability">总结梳理自然语言处理工程师(NLP)需要积累的各方面知识</a></p><p>​<em>来源：微信公众号dasou</em></p><h2 id="NLP百问百答"><a href="#NLP百问百答" class="headerlink" title="NLP百问百答"></a><a href="https://github.com/km1994/NLP-Interview-Notes">NLP百问百答</a></h2>]]></content>
+    
+    
+    <categories>
+      
+      <category>深度学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>资源推荐</tag>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>hexo博客</title>
+    <link href="/2022/09/04/hexo%E4%BD%BF%E7%94%A8/"/>
+    <url>/2022/09/04/hexo%E4%BD%BF%E7%94%A8/</url>
+    
+    <content type="html"><![CDATA[<h1 id="hexo-尝试学习"><a href="#hexo-尝试学习" class="headerlink" title="hexo 尝试学习"></a>hexo 尝试学习</h1><p><img src="/img/%E4%BD%A0%E5%A5%BD/try.png" alt="1662298260751"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>闲聊</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>深度学习</tag>
+      
+      <tag>人工智能</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="/2022/09/03/hello-world/"/>
+    <url>/2022/09/03/hello-world/</url>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>练习</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
