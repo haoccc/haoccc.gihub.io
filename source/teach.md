@@ -1,3 +1,36 @@
+# HEXO 使用教程
+
+> https://blog.csdn.net/yaorongke/article/details/119089190
+
+- 安装
+``` npm
+npm install -g hexo-cli
+hexo -v # 查看版本
+```
+
+- 创建项目**blog**初始化
+``` npm
+hexo init blog
+cd blog
+npm install
+```
+
+- 启动
+```
+# 启动前
+# hexo clean
+hexo g
+# hexo g -d  # 部署到GitHub
+hexo server
+```
+
+- hexo 新建博客
+```
+hexo new [layout]title
+```
+
+  
+
 # HEXO 多端同步
 
 > [(79条消息) hexo多终端同步和管理_玖涯的博客-CSDN博客](https://blog.csdn.net/nineya_com/article/details/103535192)
